@@ -1,4 +1,4 @@
-module gitee.com/jonny_liu/agin
+module github.com/kobshobe/agin
 
 go 1.15
 
