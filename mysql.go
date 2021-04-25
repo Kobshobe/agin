@@ -29,7 +29,7 @@ func (m *Mysql) DSN(mode string) string {
 	} else if mode == "cloud" {
 		m.Path = m.CloudPath
 		m.Password = m.DockerPwd
-	} else if mode == "real" {
+	} else if mode == "dockerInner" {
 		m.Path = m.InnerDockerPath
 		m.Password = m.DockerPwd
 	}
