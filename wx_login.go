@@ -11,49 +11,6 @@ import (
 )
 
 
-//func Login(c *gin.Context) {
-//	code := c.Query("code")
-//	if code == "" {
-//		c.JSON(400, gin.H{
-//			"err": "empty code",
-//		})
-//		return
-//	}
-//	authInfo, err := GetOpenidAndSessionKey(code)
-//	if err != nil {
-//		fmt.Println(err)
-//		c.JSON(400, gin.H{
-//			"err": "invalid code",
-//		})
-//		return
-//	}
-//	_user.Openid = authInfo.Openid
-//
-//	result := global.DB.FirstOrInit(&User{}, &User{Openid: authInfo.Openid})
-//	if result.RowsAffected == 0 {
-//		result = global.DB.Create(&_user)
-//		if result.Error != nil {
-//			c.JSON(http.StatusInternalServerError, gin.H{
-//				"err":"create user err",
-//			})
-//			return
-//		}
-//	}
-//	sk := SessionAuth{SessionKey: authInfo.SessionKey, Openid: authInfo.Openid}
-//	global.DB.Create(&sk)
-//	if result.Error != nil {
-//		c.JSON(http.StatusInternalServerError, gin.H{
-//			"err":"create user sk err",
-//		})
-//		return
-//	}
-//	c.JSON(200, gin.H{
-//		"err": "ok",
-//		"sessionKey": authInfo.SessionKey,
-//		"openid": authInfo.Openid,
-//	})
-//}
-
 // 客户端传来code获取openid和sessionKey
 func WxGetOpenidAndSessionKey(code string, wxApp WxApp) (wxLoginInfo WxLoginInfo, err error) {
 	var (
