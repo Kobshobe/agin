@@ -18,6 +18,7 @@ type Mysql struct {
 	DockerPwd       string `mapstructure:"dockerPwd" json:"dockerPwd" yaml:"dockerPwd"`
 }
 
+// 获取dsn配置
 func (m *Mysql) DSN(mode string) string {
 	if mode == "local" {
 		m.Path = m.LocalPath
