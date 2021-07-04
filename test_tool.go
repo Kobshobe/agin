@@ -1,6 +1,7 @@
 package agin
 
 import (
+	"encoding/json"
 	"github.com/bmizerany/assert"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -24,6 +25,7 @@ type THttp struct {
 	Request 		*http.Request
 }
 
+
 func (h *THttp) BaseTest(status int, bodyString string, message ...interface{}) {
 	h.Router.ServeHTTP(h.Writer, h.Request)
 
@@ -35,4 +37,19 @@ func (h *THttp) BaseTest(status int, bodyString string, message ...interface{}) 
 	if bodyString != "" {
 		assert.Equal(h.T, bodyString, h.Writer.Body.String(), m...)
 	}
+}
+
+
+func (h *THttp) GetList() (result []interface{}) {
+	d := json.NewDecoder(h.Writer.Body)
+	d.UseNumber()
+	_ = d.Decode(&result)
+	return
+}
+
+func (h *THttp) GetMap() (result map[string]interface{}) {
+	d := json.NewDecoder(h.Writer.Body)
+	d.UseNumber()
+	_ = d.Decode(&result)
+	return
 }
