@@ -1,23 +1,26 @@
 package agin
 
 import (
-	"github.com/gorilla/websocket"
-	"gorm.io/gorm"
-	"net/http"
 	"time"
 )
 
-var _register = NewRegister()
+var G = &config{}
 
-var adminDB *gorm.DB
+func Init(configFile []byte) {
+	G.ENV.Init()
+	GetConfigFromYAML(configFile, G)
+	if G.Mysql != nil {
+		G.DB = G.Mysql.InitDB(G.System.Mode)
+	}
+	if G.WxApp != nil {
+		G.WxApp.JwtLive = time.Hour * 24 * 14
+		G.WxApp.Init()
+	}
+}
 
-var wxApp *WxApp
+var _register = newAdminRegister()
 
 var qiNiuUpload QiNiu
-
-func SetDB(_db *gorm.DB)  {
-	adminDB = _db
-}
 
 func SetQiNiu(qn QiNiu)  {
 	qiNiuUpload = qn
@@ -25,16 +28,4 @@ func SetQiNiu(qn QiNiu)  {
 
 func AdminRegisterModel(model IAdminModel, name string) {
 	_register.AddAdminModel(model, name)
-}
-
-func SetWxApp(_wxApp *WxApp) {
-	wxApp = _wxApp
-	wxApp.upgrade = websocket.Upgrader{
-		HandshakeTimeout: time.Second * 10,
-		//ReadBufferSize:  1,
-		//WriteBufferSize: 1,
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}
 }

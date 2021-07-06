@@ -33,7 +33,7 @@ func (cp *ConnectionPool) AddConnection(wsConn *websocket.Conn, mode string) (co
 	}
 
 	id := cp.uuidGenerator.GetUUID()
-	if wxApp.Mode == "test" {
+	if G.System.Mode == "test" {
 		id = "qq"
 		if mode == "admin" {
 			id = "ww"
@@ -122,9 +122,9 @@ func (conn *Connection) getQrScene() (scene string) {
 
 func (conn *Connection) SetToken(openid string) (err error) {
 	if conn.mode == "admin" {
-		conn.token, err = wxApp.NewJwtToken(openid, fmt.Sprintf("%s:%s", conn.mode ,wxApp.AdminTokenVersion))
+		conn.token, err = G.WxApp.NewJwtToken(openid, fmt.Sprintf("%s:%s", conn.mode ,G.WxApp.AdminTokenVersion))
 	} else {
-		conn.token, err = wxApp.NewJwtToken(openid, fmt.Sprintf("%s:%s", conn.mode ,wxApp.TokenVersion))
+		conn.token, err = G.WxApp.NewJwtToken(openid, fmt.Sprintf("%s:%s", conn.mode ,G.WxApp.TokenVersion))
 	}
 	return
 }
@@ -139,7 +139,7 @@ func (conn *Connection) ReadMessage() (data []byte, err error) {
 		}
 	case msg := <-conn.allowLoginChan:
 		if msg == "allow" {
-			conn.outChan <- []byte(fmt.Sprintf(`{"token":"%s","liveTime":%f,"openid":"%s"}`, conn.token, wxApp.JwtLive.Hours(), conn.Openid))
+			conn.outChan <- []byte(fmt.Sprintf(`{"token":"%s","liveTime":%f,"openid":"%s"}`, conn.token, G.WxApp.JwtLive.Hours(), conn.Openid))
 		}
 	case <-conn.closeChan:
 		err = errors.New("connection is closed")
@@ -153,7 +153,7 @@ func (conn *Connection) WriteMessage(data []byte) (err error) {
 	)
 	if string(data) == "login" {
 		//fmt.Println("write qr")
-		if buf, err = wxApp.GetQRFromWX(conn.getQrScene()); err != nil {
+		if buf, err = G.WxApp.GetQRFromWX(conn.getQrScene()); err != nil {
 			err = errors.New("get buf err")
 		}
 		fmt.Println("write qr")
@@ -175,7 +175,7 @@ func (conn *Connection) Close() {
 	if !conn.isClosed {
 		close(conn.closeChan)
 		conn.isClosed = true
-		delete(wxApp.OAuthConnPool.Pool, conn.uuid)
+		delete(G.WxApp.OAuthConnPool.Pool, conn.uuid)
 	}
 }
 
@@ -187,6 +187,7 @@ func (conn *Connection) readLoop() {
 	)
 	for {
 		if _, data, err = conn.wsConn.ReadMessage(); err != nil {
+			fmt.Println("ReadMessage err: ", err)
 			_ = conn.wsConn.Close()
 			goto ERR
 		}

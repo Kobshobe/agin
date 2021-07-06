@@ -25,8 +25,8 @@ type register struct {
 	Models map[string]IAdminModel
 }
 
-func NewRegister() register {
-	return register{make(map[string]IAdminModel)}
+func newAdminRegister() *register {
+	return &register{make(map[string]IAdminModel)}
 }
 
 type IAdminModel interface {
@@ -115,7 +115,7 @@ func NewBaseModel(model interface{}, records interface{}) BaseModel {
 
 func (m BaseModel) GetRecordAmount() int64 {
 	var count int64
-	adminDB.Model(m.Model).Count(&count)
+	G.DB.Model(m.Model).Count(&count)
 	return count
 }
 
@@ -218,7 +218,7 @@ func (m BaseModel) Updates(c *gin.Context) {
 		return
 	}
 
-	result := adminDB.Model(m.Model).Updates(m.Model)
+	result := G.DB.Model(m.Model).Updates(m.Model)
 	if result.Error != nil {
 		c.String(500, "update err")
 	} else {
@@ -239,7 +239,7 @@ func (m BaseModel) Create(c *gin.Context) {
 	f := v.Elem().FieldByName("ID")
 	f.SetUint(0)
 
-	result := adminDB.Create(m.Model)
+	result := G.DB.Create(m.Model)
 	if result.Error != nil {
 		c.String(500, "create err")
 	} else {
@@ -259,7 +259,7 @@ func (m BaseModel) Delete(c *gin.Context) {
 		return
 	}
 
-	result := adminDB.Delete(m.Records, bindStruct.Ids)
+	result := G.DB.Delete(m.Records, bindStruct.Ids)
 	if result.Error != nil {
 		c.String(400, "delete err")
 		return

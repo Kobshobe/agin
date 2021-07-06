@@ -125,7 +125,7 @@ func MAdminAuth() gin.HandlerFunc {
 			goto ERR
 		}
 
-		openid, _, err = wxApp.GetTokenInfo(token)
+		openid, _, err = G.WxApp.GetTokenInfo(token)
 	ERR:
 		if err != nil {
 			fmt.Println(err.Error())
@@ -136,7 +136,7 @@ func MAdminAuth() gin.HandlerFunc {
 			return
 		}
 
-		for _, id := range wxApp.AdminOpenid {
+		for _, id := range G.WxApp.AdminOpenid {
 			if openid == id {
 				isAllow = true
 			}
@@ -165,7 +165,7 @@ func MWxAuth() gin.HandlerFunc {
 			goto ERR
 		}
 
-		openid, _, err = wxApp.GetTokenInfo(token)
+		openid, _, err = G.WxApp.GetTokenInfo(token)
 	ERR:
 		if err != nil {
 			c.JSON(401, gin.H{

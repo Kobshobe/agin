@@ -15,7 +15,7 @@ type Filter struct {
 
 func NewFilter(model interface{}) Filter {
 	f := Filter{}
-	f.Finder = adminDB.Model(model)
+	f.Finder = G.DB.Model(model)
 	return f
 }
 

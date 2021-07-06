@@ -56,7 +56,7 @@ func (config *Mysql) InitDB(mode string) *gorm.DB {
 		SkipInitializeWithVersion: true, // 根据版本自动配置
 	}
 	fmt.Println("db begin connect ...")
-	if db, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{}); err != nil {
+	if db, err := gorm.Open(mysql.New(mysqlConfig), gormConfig(true)); err != nil {
 		log.Fatal("db connect fail: ", err)
 		return nil
 	} else {
@@ -76,7 +76,7 @@ func (config *Mysql) InitDB(mode string) *gorm.DB {
 //@return: *gorm.Config
 
 func gormConfig(mod bool) *gorm.Config {
-	var config = &gorm.Config{DisableForeignKeyConstraintWhenMigrating: false}
+	var config = &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}
 	//switch global.CONFIG.Mysql.LogZap {
 	//case "silent", "Silent":
 	//	config.Logger = internal.Default.LogMode(logger.Silent)

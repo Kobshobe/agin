@@ -12,7 +12,7 @@ import (
 )
 
 // 客户端传来code获取openid和sessionKey
-func WxGetOpenidAndSessionKey(code string, wxApp WxApp) (wxLoginInfo JWxLoginInfo, err error) {
+func WxGetOpenidAndSessionKey(code string, wxApp *WxApp) (wxLoginInfo JWxLoginInfo, err error) {
 	var (
 		_url string
 		resq *http.Response
@@ -46,13 +46,12 @@ func WxGetOpenidAndSessionKey(code string, wxApp WxApp) (wxLoginInfo JWxLoginInf
 }
 
 type WxApp struct {
-	Mode              string
-	AppId             string `mapstructure:"appId" json:"appId" yaml:"appId"`
-	AppSecret         string `mapstructure:"APPSECRET" json:"APPSECRET" yaml:"APPSECRET"`
+	AppId             string `yaml:"appId"`
+	AppSecret         string `yaml:"appSecret"`
 	JwtLive           time.Duration
-	JwtSecret         string `mapstructure:"jwtSecret" json:"jwtSecret" yaml:"jwtSecret"`
-	TokenVersion      string `mapstructure:"tokenVersion" json:"tokenVersion" yaml:"tokenVersion"`
-	AdminTokenVersion string `mapstructure:"adminTokenVersion" json:"adminTokenVersion" yaml:"adminTokenVersion"`
+	JwtSecret         string `yaml:"jwtSecret"`
+	TokenVersion      string `yaml:"tokenVersion"`
+	AdminTokenVersion string `yaml:"adminTokenVersion"`
 
 	AccessToken     string
 	AccessTokenTime time.Time
@@ -63,6 +62,17 @@ type WxApp struct {
 	AdminOpenid []string
 
 	upgrade websocket.Upgrader
+}
+
+func (w *WxApp) Init() {
+	w.upgrade = websocket.Upgrader{
+		HandshakeTimeout: time.Second * 10,
+		//ReadBufferSize:  1,
+		//WriteBufferSize: 1,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
 }
 
 func (w *WxApp) AddOAuthConn(write http.ResponseWriter, request *http.Request, head http.Header, mode string) (conn *Connection, err error) {
@@ -90,7 +100,7 @@ func (w *WxApp) GetOAuthConn(uuid string, mode string) (conn *Connection, ok boo
 	return
 }
 
-func (w WxApp) Upgrade(write http.ResponseWriter, request *http.Request, head http.Header) (conn *websocket.Conn, err error) {
+func (w *WxApp) Upgrade(write http.ResponseWriter, request *http.Request, head http.Header) (conn *websocket.Conn, err error) {
 	conn, err = w.upgrade.Upgrade(write, request, nil)
 
 	return
@@ -142,13 +152,13 @@ func (w *WxApp) getAccessToken() (token string, err error) {
 	return "", nil
 }
 
-func (w WxApp) GetAccessTokenUrl() string {
+func (w *WxApp) GetAccessTokenUrl() string {
 	return fmt.Sprintf(
 		"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
 		w.AppId, w.AppSecret)
 }
 
-func (w WxApp) GetTokenInfo(token string) (openid string, versionInfo string, err error) {
+func (w *WxApp) GetTokenInfo(token string) (openid string, versionInfo string, err error) {
 	info, err := ParseJwtToken(token, w.JwtSecret)
 	if err != nil {
 		return
@@ -159,12 +169,12 @@ func (w WxApp) GetTokenInfo(token string) (openid string, versionInfo string, er
 	return
 }
 
-func (w WxApp) WxLoginUrl(code string) string {
+func (w *WxApp) WxLoginUrl(code string) string {
 	return fmt.Sprintf("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
 		w.AppId, w.AppSecret, code)
 }
 
-func (w WxApp) NewJwtToken(openid, versionInfo string) (token string, err error) {
+func (w *WxApp) NewJwtToken(openid, versionInfo string) (token string, err error) {
 	token, err = CreateJwtToken(getJwtUid(openid, versionInfo), w.JwtSecret, w.JwtLive)
 
 	return
@@ -209,7 +219,7 @@ func (w *WxApp) GetQRFromWX(scene string) (buffer []byte, error error) {
 	return body, nil
 }
 
-func (w WxApp) GetQRUrl() (token string, err error) {
+func (w *WxApp) GetQRUrl() (token string, err error) {
 	token, err = w.getAccessToken()
 	if err != nil {
 		return

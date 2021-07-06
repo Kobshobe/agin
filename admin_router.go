@@ -6,7 +6,6 @@ import (
 )
 
 func AdminRouterRegister(r *gin.Engine, urlPrefix string, db *gorm.DB) {
-	SetDB(db)
 	group := r.Group(urlPrefix)
 	group.Use(MAdminAuth())
 	group.Use(Cors())

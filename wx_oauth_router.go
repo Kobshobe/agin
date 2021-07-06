@@ -8,20 +8,20 @@ import (
 
 
 func WxOAuthRouterRegister(router *gin.RouterGroup, qrUrl string, allowUrl string) {
-	if wxApp.JwtSecret == "" || wxApp.AppId == "" || wxApp.Mode == "" {
+	if G.WxApp.JwtSecret == "" || G.WxApp.AppId == "" || G.System.Mode == "" {
 		panic("Should init wxApp")
 	}
-	wxApp.OAuthConnPool = NewConnectionPool()
+	G.WxApp.OAuthConnPool = NewConnectionPool()
 	router.GET(qrUrl, QrLogin)
 	router.GET(allowUrl, allowLogin)
 }
 
 
 func WxAdminOAuthRouterRegister(router *gin.RouterGroup, qrUrl string, allowUrl string) {
-	if wxApp.JwtSecret == "" || wxApp.AppId == "" || wxApp.Mode == "" {
+	if G.WxApp.JwtSecret == "" || G.WxApp.AppId == "" || G.System.Mode == "" {
 		panic("Should init wxApp")
 	}
-	wxApp.adminConnPool = NewConnectionPool()
+	G.WxApp.adminConnPool = NewConnectionPool()
 	router.GET(qrUrl, QrLogin)
 	router.GET(allowUrl, allowLogin)
 }
@@ -34,7 +34,7 @@ func QrLogin(c *gin.Context) {
 		conn   *Connection
 	)
 
-	if conn, err = wxApp.AddOAuthConn(c.Writer, c.Request, nil, c.GetHeader("m")); err != nil {
+	if conn, err = G.WxApp.AddOAuthConn(c.Writer, c.Request, nil, c.GetHeader("m")); err != nil {
 		goto ERR
 	}
 
@@ -65,7 +65,7 @@ func allowLogin(c *gin.Context) {
 	)
 
 	uuid = c.Query("uuid")
-	conn, ok = wxApp.GetOAuthConn(uuid, c.GetHeader("m"))
+	conn, ok = G.WxApp.GetOAuthConn(uuid, c.GetHeader("m"))
 	if ok == false || conn.isClosed == true {
 		fmt.Println("no in pool")
 		c.JSON(200, gin.H{
@@ -76,7 +76,7 @@ func allowLogin(c *gin.Context) {
 	}
 
 	// 生成token
-	openid, _, err = wxApp.GetTokenInfo(c.Request.Header.Get("Authorization"))
+	openid, _, err = G.WxApp.GetTokenInfo(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		c.JSON(401, gin.H{
 			"err": "err Token",

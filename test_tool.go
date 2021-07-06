@@ -53,3 +53,18 @@ func (h *THttp) GetMap() (result map[string]interface{}) {
 	_ = d.Decode(&result)
 	return
 }
+
+// mac:"darwin"
+func IsCanDeleteData(os string) bool {
+	if G.System.Mode == "test" && G.ENV.SystemOS() == os {
+		return true
+	}
+	return false
+}
+
+//func CreateTestUser(user JWxLoginInfo, model interface{}) {
+//	result := G.DB.Where(`openid = ?`, user.Openid).First(model)
+//	if result.RowsAffected == 0 {
+//		G.DB.Create(model.User{Openid: user.Openid})
+//	}
+//}
