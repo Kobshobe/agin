@@ -2,8 +2,8 @@ package agin
 
 import (
 	"encoding/json"
-	"github.com/bmizerany/assert"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -32,10 +32,11 @@ func (h *THttp) BaseTest(status int, bodyString string, message ...interface{}) 
 	m := []interface{}{h.Method + " url: " + h.Url + "\n"}
 	m = append(m, message, "ResponseBody:"+h.Writer.Body.String())
 
-	assert.Equal(h.T, status, h.Writer.Code, m...)
+	require.Equal(h.T, status, h.Writer.Code, m...)
+	//assert.Equal(h.T, status, h.Writer.Code, m...)
 
 	if bodyString != "" {
-		assert.Equal(h.T, bodyString, h.Writer.Body.String(), m...)
+		require.Equal(h.T, bodyString, h.Writer.Body.String(), m...)
 	}
 }
 

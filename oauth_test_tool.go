@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/bmizerany/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -70,9 +70,9 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 				d := json.NewDecoder(bytes.NewReader(p))
 				_ = d.Decode(&tokenInfo)
 				//fmt.Println(tokenInfo)
-				assert.Equal(t, tokenInfo["liveTime"], G.WxApp.JwtLive.Hours())
-				assert.Equal(t, len(tokenInfo["token"].(string)) > 20, true)
-				assert.Equal(t, len(tokenInfo["openid"].(string)) > 10, true)
+				require.Equal(t, tokenInfo["liveTime"], G.WxApp.JwtLive.Hours())
+				require.Equal(t, len(tokenInfo["token"].(string)) > 20, true)
+				require.Equal(t, len(tokenInfo["openid"].(string)) > 10, true)
 				done <- true
 			} else {
 				//fmt.Println(pStr)
@@ -104,5 +104,5 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 		t.Fatal("[ws test] get qToken err")
 	}
 
-	assert.Equal(t, loginOk, true)
+	require.Equal(t, loginOk, true)
 }
