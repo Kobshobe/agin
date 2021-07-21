@@ -12,7 +12,7 @@ import (
 )
 
 // 客户端传来code获取openid和sessionKey
-func WxGetOpenidAndSessionKey(code string, wxApp *WxApp) (wxLoginInfo JWxLoginInfo, err error) {
+func (w *WxApp) WxGetOpenidAndSessionKey(code string) (wxLoginInfo JWxLoginInfo, err error) {
 	var (
 		_url string
 		resq *http.Response
@@ -23,7 +23,7 @@ func WxGetOpenidAndSessionKey(code string, wxApp *WxApp) (wxLoginInfo JWxLoginIn
 		err = errors.New("empty code")
 		return
 	}
-	_url = wxApp.WxLoginUrl(code)
+	_url = w.WxLoginUrl(code)
 	resq, err = http.Get(_url)
 
 	if err != nil {

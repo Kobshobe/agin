@@ -7,16 +7,17 @@ import (
 )
 
 type config struct {
-	WxApp  *WxApp  `yaml:"wxApp"`
-	Mysql  *Mysql  `yaml:"mysql"`
-	System *System `yaml:"system"`
-	Email  *Email  `yaml:"email"`
-	Log    *Logger  `yaml:"logger"`
-	DB     *gorm.DB
-	ENV    env
+	WxApp     *WxApp     `yaml:"wxApp"`
+	Mysql     *Mysql     `yaml:"mysql"`
+	System    *System    `yaml:"system"`
+	Email     *Email     `yaml:"email"`
+	Log       *Logger    `yaml:"logger"`
+	GAnalytic *GAnalytic `yaml:"GAnalytic"`
+	DB        *gorm.DB
+	ENV       env
 }
 
-func (c *config) Init() {
+func (c *config) init() {
 	if c.Mysql != nil {
 		c.DB = c.Mysql.InitDB(G.System.Mode)
 	}
@@ -27,7 +28,12 @@ func (c *config) Init() {
 	if c.Log != nil {
 		c.Log.Init()
 	}
-
+	if c.Email != nil {
+		c.Email.Init()
+	}
+	if c.GAnalytic != nil {
+		c.GAnalytic.Init()
+	}
 }
 
 type System struct {

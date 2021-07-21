@@ -156,7 +156,7 @@ func (conn *Connection) WriteMessage(data []byte) (err error) {
 		if buf, err = G.WxApp.GetQRFromWX(conn.getQrScene()); err != nil {
 			err = errors.New("get buf err")
 		}
-		fmt.Println("write qr")
+		//fmt.Println("write qr")
 		conn.outChan <- buf
 	} else if string(data) == "allow" {
 		//fmt.Println("login ok")
@@ -187,7 +187,7 @@ func (conn *Connection) readLoop() {
 	)
 	for {
 		if _, data, err = conn.wsConn.ReadMessage(); err != nil {
-			fmt.Println("ReadMessage err: ", err)
+			//fmt.Println("ReadMessage err: ", err)
 			_ = conn.wsConn.Close()
 			goto ERR
 		}

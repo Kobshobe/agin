@@ -5,7 +5,7 @@ var G = &config{}
 func Init(configFile []byte) {
 	G.ENV.Init()
 	GetConfigFromYAML(configFile, G)
-	G.Init()
+	G.init()
 }
 
 var _register = newAdminRegister()

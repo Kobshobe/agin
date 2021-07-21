@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -34,6 +34,8 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 	if err != nil {
 		t.Fatalf("[ws test] create ws err: %v", err)
 	}
+
+
 	go func() {
 		_, p, err := ws.ReadMessage()
 		if err != nil {
@@ -41,7 +43,7 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 		}
 		_ = string(p)
 		// 将二维码写入文件
-		//file, err := os.OpenFile("./111.jpeg", os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
+		//file, err := os.OpenFile(fmt.Sprintf("./%s.jpeg", mode), os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
 		//if err != nil {
 		//	fmt.Println("open image err", err)
 		//}
@@ -50,7 +52,7 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 		//if err != nil {
 		//	t.Error("save qr image err")
 		//}
-		fmt.Println("[ws test] get QR img")
+		fmt.Println("[ws test] get QR img ok")
 		getQrOk <- true
 		//fmt.Println(response)
 	}()
@@ -64,7 +66,7 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 			}
 			pStr := string(p)
 			if strings.HasPrefix(pStr, `{"token":`) {
-				//fmt.Println("[ws test] get qToken info: ", pStr)
+				fmt.Println("[ws test] get qToken info: ", pStr)
 				loginOk = true
 				tokenInfo := make(map[string]interface{})
 				d := json.NewDecoder(bytes.NewReader(p))
@@ -79,7 +81,8 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 				done <- false
 			}
 		}()
-		// 模拟：扫描小程序码
+
+		// ==================== 模拟：扫描小程序码
 		client := &http.Client{}
 		request, err := http.NewRequest("GET", fmt.Sprintf("%s%s?uuid=%s",s.URL, allowUrl, testUuid), nil)
 		if err != nil {
@@ -103,6 +106,7 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 	if !isOk {
 		t.Fatal("[ws test] get qToken err")
 	}
+	fmt.Println("get token ok")
 
 	require.Equal(t, loginOk, true)
 }
