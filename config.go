@@ -3,7 +3,6 @@ package agin
 import (
 	"gopkg.in/yaml.v2"
 	"gorm.io/gorm"
-	"time"
 )
 
 type config struct {
@@ -22,7 +21,6 @@ func (c *config) init() {
 		c.DB = c.Mysql.InitDB(G.System.Mode)
 	}
 	if c.WxApp != nil {
-		c.WxApp.JwtLive = time.Hour * 24 * 14
 		c.WxApp.Init()
 	}
 	if c.Log != nil {

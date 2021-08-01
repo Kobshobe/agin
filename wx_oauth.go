@@ -32,7 +32,7 @@ func (cp *ConnectionPool) AddConnection(wsConn *websocket.Conn, mode string) (co
 		return
 	}
 
-	id := cp.uuidGenerator.GetUUID()
+	id := cp.uuidGenerator.GetUID()
 	if G.System.Mode == "test" {
 		id = "qq"
 		if mode == "admin" {
@@ -63,7 +63,7 @@ type SceneID struct {
 
 
 // get scene uuid
-func (s *SceneID) GetUUID() string {
+func (s *SceneID) GetUID() string {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	s.lastID ++
@@ -139,7 +139,7 @@ func (conn *Connection) ReadMessage() (data []byte, err error) {
 		}
 	case msg := <-conn.allowLoginChan:
 		if msg == "allow" {
-			conn.outChan <- []byte(fmt.Sprintf(`{"token":"%s","liveTime":%f,"openid":"%s"}`, conn.token, G.WxApp.JwtLive.Hours(), conn.Openid))
+			conn.outChan <- []byte(fmt.Sprintf(`{"token":"%s","liveTime":%f,"openid":"%s"}`, conn.token, G.WxApp.GetJwtLife().Hours(), conn.Openid))
 		}
 	case <-conn.closeChan:
 		err = errors.New("connection is closed")

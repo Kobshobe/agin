@@ -48,10 +48,12 @@ func (w *WxApp) WxGetOpenidAndSessionKey(code string) (wxLoginInfo JWxLoginInfo,
 type WxApp struct {
 	AppId             string `yaml:"appId"`
 	AppSecret         string `yaml:"appSecret"`
-	JwtLive           time.Duration
+	JwtLife           int    `yaml:"jwtLife"`
 	JwtSecret         string `yaml:"jwtSecret"`
 	TokenVersion      string `yaml:"tokenVersion"`
 	AdminTokenVersion string `yaml:"adminTokenVersion"`
+
+	jwtLife				time.Duration
 
 	AccessToken     string
 	AccessTokenTime time.Time
@@ -59,7 +61,7 @@ type WxApp struct {
 	OAuthConnPool ConnectionPool
 
 	adminConnPool ConnectionPool
-	AdminOpenid []string
+	AdminOpenid   []string
 
 	upgrade websocket.Upgrader
 }
@@ -73,6 +75,23 @@ func (w *WxApp) Init() {
 			return true
 		},
 	}
+	w.SetJwtLife(w.JwtLife, true)
+}
+
+func (w *WxApp) SetJwtLife(life int, isDay bool) {
+	if life <= 0 {
+		panic("jwt token life required positive number")
+	}
+	if isDay {
+		w.jwtLife = time.Hour * 24 * time.Duration(life)
+	} else {
+		w.jwtLife = time.Second * time.Duration(life)
+	}
+
+}
+
+func (w *WxApp) GetJwtLife() time.Duration {
+	return w.jwtLife
 }
 
 func (w *WxApp) AddOAuthConn(write http.ResponseWriter, request *http.Request, head http.Header, mode string) (conn *Connection, err error) {
@@ -175,7 +194,7 @@ func (w *WxApp) WxLoginUrl(code string) string {
 }
 
 func (w *WxApp) NewJwtToken(openid, versionInfo string) (token string, err error) {
-	token, err = CreateJwtToken(getJwtUid(openid, versionInfo), w.JwtSecret, w.JwtLive)
+	token, err = CreateJwtToken(getJwtUid(openid, versionInfo), w.JwtSecret, w.jwtLife)
 
 	return
 }

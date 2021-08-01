@@ -72,7 +72,7 @@ func OAuthTest(engine *gin.Engine, t *testing.T, qrUrl string, allowUrl string, 
 				d := json.NewDecoder(bytes.NewReader(p))
 				_ = d.Decode(&tokenInfo)
 				//fmt.Println(tokenInfo)
-				require.Equal(t, tokenInfo["liveTime"], G.WxApp.JwtLive.Hours())
+				require.Equal(t, tokenInfo["liveTime"], G.WxApp.GetJwtLife().Hours())
 				require.Equal(t, len(tokenInfo["token"].(string)) > 20, true)
 				require.Equal(t, len(tokenInfo["openid"].(string)) > 10, true)
 				done <- true
